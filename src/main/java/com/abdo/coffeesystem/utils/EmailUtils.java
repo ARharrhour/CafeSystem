@@ -1,0 +1,47 @@
+package com.abdo.coffeesystem.utils;
+
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.AllArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@AllArgsConstructor
+public class EmailUtils {
+
+    private JavaMailSender emailSender;
+
+    public void SendSimpleMessage(String to , String subject , String text , List<String> list){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("ahmed.nami.1996@gmail.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        if(list != null && !list.isEmpty())
+            message.setCc(getCcArray(list));
+        emailSender.send(message);
+    }
+    public String[] getCcArray(List<String> cclist){
+        String[] cc = new String[cclist.size()];
+        for (int i = 0 ; i < cclist.size(); i++){
+            cc[i] = cclist.get(i);
+        }
+        return cc;
+    }
+    public void  forgetMail(String to , String subject, String password) throws MessagingException {
+        MimeMessage message = emailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom("projectteamemail99@gmail.com");
+        helper.setTo(to);
+        helper.setSubject(subject);
+        String htmlMSG = "<p><b>Your Login details for Cafe Management System</b></p><b>Email:</b>"+ to + "<br><b>Password: </b>" + password + "<br><a href=\"http://localhost:4200/\">Click here to login</a></p>";
+        message.setContent(htmlMSG , "text/html");
+        emailSender.send(message);
+    }
+}
